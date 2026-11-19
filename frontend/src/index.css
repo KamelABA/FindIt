@@ -50,6 +50,10 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+:root {
+  --nav-h: 3.375rem; /* height the sticky nav bar takes at the top of the page */
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -164,6 +168,18 @@
 }
 @utility container-page {
   @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+/* Full-screen sections.
+   section-screen-first: the first block of a page. Nav bar + block = exactly one screen.
+   section-screen:       every following block = one screen (it grows when its content is taller).
+   Combine with `flex flex-col justify-center` to centre the content. `--nav-h` = pt-2.5 + 44px capsule. */
+@utility section-screen-first {
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100svh - var(--nav-h));
+}
+@utility section-screen {
+  min-height: 100vh;
+  min-height: 100svh;
 }
 /* Small label above headings and for metadata */
 @utility eyebrow {

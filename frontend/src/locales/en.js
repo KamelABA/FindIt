@@ -44,6 +44,9 @@ export default {
 
   steps: {
     aria: "How it works",
+    eyebrow: "How it works",
+    title: "Three steps to get it back",
+    subtitle: "From the moment it goes missing to the moment it is in your hands again.",
     report: { title: "Report", text: "Describe what you lost or found, add a photo and where it happened." },
     match: { title: "Match", text: "Search approved reports by keyword, category or place on campus." },
     reunite: { title: "Reunite", text: "Contact the publisher and meet in a public place to hand the item back." },

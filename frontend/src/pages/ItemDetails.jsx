@@ -78,11 +78,17 @@ export default function ItemDetails() {
   const { t, lang, dateLocale } = useI18n();
   const { data: item, loading, error, retry } = useAsync((signal) => getItemById(id, { signal, lang }), [id, lang]);
 
-  if (loading) return <Spinner label={t("details.loading")} />;
+  if (loading) {
+    return (
+      <div className="section-screen-first grid place-items-center">
+        <Spinner label={t("details.loading")} />
+      </div>
+    );
+  }
 
   if (error) {
     return (
-      <div className="container-page py-20">
+      <div className="container-page section-screen-first flex flex-col justify-center py-20">
         <ErrorState
           message={error.status === 404 ? t("details.notFound") : errorText(t, error)}
           onRetry={error.status === 404 ? undefined : retry}
@@ -101,7 +107,7 @@ export default function ItemDetails() {
   const dateLabel = item.type === "found" ? t("details.dateFound") : t("details.dateLost");
 
   return (
-    <div className="container-page pb-24 pt-10">
+    <div className="container-page section-screen-first pb-24 pt-10">
       {/* Breadcrumb */}
       <nav className="mb-8 flex flex-wrap items-center gap-2 text-xs font-medium text-muted" aria-label={t("details.breadcrumb")}>
         <Link to="/" className="hover:text-ink">{t("details.crumbHome")}</Link>

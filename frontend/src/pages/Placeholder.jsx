@@ -12,8 +12,8 @@ export default function Placeholder({ titleKey, title, owner }) {
   const heading = titleKey ? t(titleKey) : title;
 
   return (
-    <div className="container-page py-28 text-center">
-      <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-100 text-brand-ink">
+    <div className="container-page section-screen-first flex flex-col items-center justify-center py-20 text-center">
+      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-100 text-brand-ink">
         <Icon name="tool" className="h-7 w-7" />
       </span>
       <p className="eyebrow mt-6 text-brand-ink">{t("placeholder.badge")}</p>

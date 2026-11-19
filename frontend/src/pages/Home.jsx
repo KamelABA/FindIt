@@ -178,8 +178,8 @@ function Hero() {
   );
 
   return (
-    <section className="container-page pt-4 sm:pt-6">
-      <div ref={root} className="relative isolate overflow-hidden rounded-[2rem] border border-ink/10 bg-surface">
+    <section className="container-page flex flex-1 flex-col pt-4 sm:pt-6">
+      <div ref={root} className="relative isolate flex flex-1 items-center overflow-hidden rounded-[2rem] border border-ink/10 bg-surface">
         {/* brand waves in two corners (mirrored in Arabic) */}
         <div data-waves className="absolute start-0 top-0 -z-10 h-20 w-36 origin-top-left will-change-transform sm:h-28 sm:w-52 lg:h-36 lg:w-64 rtl:origin-top-right">
           <Waves className="inset-0 h-full w-full rtl:-scale-x-100" />
@@ -189,7 +189,7 @@ function Hero() {
         </div>
         <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-br from-paper via-surface to-paper-2" />
 
-        <div className="relative grid items-center gap-10 px-6 pb-14 pt-20 sm:px-12 sm:pb-16 sm:pt-24 lg:grid-cols-12 lg:gap-12 lg:px-16 lg:py-20">
+        <div className="relative grid w-full items-center gap-10 px-6 pb-14 pt-20 sm:px-12 sm:pb-16 sm:pt-24 lg:grid-cols-12 lg:gap-12 lg:px-16 lg:py-20">
           <div className="lg:col-span-7">
             {/* FindIt title + slogan */}
             <div data-hero="brand">
@@ -265,19 +265,20 @@ function HowItWorks() {
   );
 
   return (
-    <section className="container-page py-16 sm:py-20" aria-label={t("steps.aria")}>
+    <section className="container-page section-screen flex flex-col justify-center py-20">
+      <SectionTitle eyebrow={t("steps.eyebrow")} title={t("steps.title")} subtitle={t("steps.subtitle")} />
       <div ref={root} className="relative">
         <span data-rule className="absolute inset-x-0 top-0 h-px origin-left bg-ink/15 rtl:origin-right" aria-hidden="true" />
         <ol className="grid divide-y divide-ink/10 md:grid-cols-3 md:divide-x md:divide-y-0">
           {STEPS.map((step, i) => (
-            <li key={step} className="py-7 md:px-8 md:first:ps-0 md:last:pe-0">
+            <li key={step} className="py-9 md:px-8 md:py-12 md:first:ps-0 md:last:pe-0">
               <div data-step className="flex gap-5">
-                <span data-step-n className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-500 text-xs font-bold tabular-nums text-white">
+                <span data-step-n className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-500 text-sm font-bold tabular-nums text-white shadow-[0_10px_22px_-12px_rgba(225,6,0,0.75)]">
                   0{i + 1}
                 </span>
                 <div>
-                  <h3 className="display text-2xl text-ink">{t(`steps.${step}.title`)}</h3>
-                  <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">{t(`steps.${step}.text`)}</p>
+                  <h3 className="display text-3xl text-ink">{t(`steps.${step}.title`)}</h3>
+                  <p className="mt-3 max-w-xs leading-relaxed text-muted">{t(`steps.${step}.text`)}</p>
                 </div>
               </div>
             </li>
@@ -311,7 +312,7 @@ function SectionTitle({ eyebrow, title, subtitle, action }) {
 function CategoriesSection() {
   const { t } = useI18n();
   return (
-    <section className="container-page pb-20">
+    <section className="container-page section-screen flex flex-col justify-center py-20">
       <SectionTitle eyebrow={t("categoriesSection.eyebrow")} title={t("categoriesSection.title")} subtitle={t("categoriesSection.subtitle")} />
       {/* tiles are dealt onto the table one after another */}
       <StaggerIn variant="deal" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -330,7 +331,7 @@ function LatestItemsSection() {
   const { data: items, loading, error, retry } = useAsync((signal) => getItems({ limit: 8, signal, lang }), [lang]);
 
   return (
-    <section className="border-y border-ink/10 bg-paper-2/60 py-20">
+    <section className="section-screen flex flex-col justify-center border-y border-ink/10 bg-paper-2/60 py-20">
       <div className="container-page">
         <SectionTitle
           eyebrow={t("latest.eyebrow")}
@@ -374,8 +375,11 @@ export default function Home() {
   const { t } = useI18n();
   return (
     <>
-      <Hero />
-      <Marquee words={t("marquee")} className="mt-10 sm:mt-14" />
+      {/* first screen: the hero fills what the nav bar leaves, the word band closes it */}
+      <div className="section-screen-first flex flex-col">
+        <Hero />
+        <Marquee words={t("marquee")} className="mt-5 sm:mt-6" />
+      </div>
       <HowItWorks />
       <CategoriesSection />
       <LatestItemsSection />

@@ -138,7 +138,7 @@ export default function BrowseItems() {
   const count = shown?.length ?? 0;
 
   return (
-    <div className="container-page pb-24 pt-12">
+    <div className="container-page section-screen-first pb-24 pt-12">
       <header className="flex flex-wrap items-end justify-between gap-4 border-b border-ink/10 pb-8">
         <div>
           <p className="eyebrow mb-3 text-brand-ink">{t("browse.eyebrow")}</p>
