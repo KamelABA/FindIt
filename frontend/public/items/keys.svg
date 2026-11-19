@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#5b6068"/>
+  <g fill="#6a7079"><circle cx="80" cy="90" r="5"/><circle cx="210" cy="520" r="6"/><circle cx="690" cy="110" r="5"/><circle cx="610" cy="500" r="4"/><circle cx="130" cy="330" r="3"/><circle cx="730" cy="340" r="4"/><circle cx="330" cy="70" r="3"/><circle cx="480" cy="550" r="5"/></g>
+  <path d="M-20 520 820 450v36L-20 556z" fill="#f2efe6" opacity=".8"/>
+  <!-- key ring -->
+  <circle cx="408" cy="230" r="64" fill="none" stroke="#1d2026" stroke-width="10" opacity=".25"/>
+  <circle cx="400" cy="220" r="64" fill="none" stroke="#c9ced6" stroke-width="10"/>
+  <circle cx="400" cy="220" r="64" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="60 342" opacity=".7"/>
+  <!-- three keys -->
+  <g transform="translate(352 262) rotate(38)">
+    <circle r="34" fill="#d9b25a"/><circle r="12" fill="#5b6068"/>
+    <path d="M-10 30h20v150l-10 14-10-14z" fill="#d9b25a"/><path d="M10 96h16v14H10zM10 124h22v14H10zM10 152h14v12H10z" fill="#d9b25a"/><path d="M0 40v130" stroke="#b48a1c" stroke-width="3"/>
+  </g>
+  <g transform="translate(396 284) rotate(6)">
+    <rect x="-32" y="-30" width="64" height="60" rx="16" fill="#c9ced6"/><circle cy="-6" r="11" fill="#5b6068"/>
+    <path d="M-9 28h18v160l-9 12-9-12z" fill="#c9ced6"/><path d="M9 104h14v12H9zM9 130h20v12H9zM9 158h12v12H9z" fill="#c9ced6"/><path d="M0 40v140" stroke="#9aa2ae" stroke-width="3"/>
+  </g>
+  <g transform="translate(440 260) rotate(-32)">
+    <path d="M-30 0a30 30 0 0 1 60 0c0 20-14 34-30 34S-30 20-30 0z" fill="#aeb5c0"/><circle cy="-2" r="10" fill="#5b6068"/>
+    <path d="M-8 30h16v120l-8 10-8-10z" fill="#aeb5c0"/><path d="M8 84h12v10H8zM8 106h18v10H8z" fill="#aeb5c0"/>
+  </g>
+  <!-- red star keychain -->
+  <path d="M458 196c50-14 96 0 122 40" fill="none" stroke="#c9ced6" stroke-width="5" stroke-dasharray="10 5"/>
+  <g transform="translate(600 340) rotate(14)">
+    <path d="M0-112 30-36l82 4-64 52 22 80L0 54l-70 46 22-80-64-52 82-4z" fill="#1d2026" opacity=".25" transform="translate(8 10)"/>
+    <path d="M0-112 30-36l82 4-64 52 22 80L0 54l-70 46 22-80-64-52 82-4z" fill="#d92d2d" stroke="#b11f1f" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M-4-78 12-34" stroke="#fff" stroke-width="7" opacity=".35" stroke-linecap="round"/>
+    <circle cy="-84" r="8" fill="#5b6068" stroke="#c9ced6" stroke-width="4"/>
+  </g>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#e8dfd0"/>
+  <path d="M0 0h260c40 90 30 220-40 300S60 420 0 430z" fill="#1b3766"/>
+  <path d="M0 0h200c30 80 22 180-30 244S50 340 0 348z" fill="#234580"/>
+  <path d="M252 20c36 90 24 204-40 276" fill="none" stroke="#d4a72c" stroke-width="3" stroke-dasharray="4 8"/>
+  <!-- notebooks -->
+  <g transform="translate(430 250) rotate(-10)">
+    <rect x="-134" y="-166" width="280" height="350" rx="10" fill="#3b2f1c" opacity=".18"/>
+    <rect x="-140" y="-175" width="280" height="350" rx="10" fill="#c9503f"/>
+    <rect x="-90" y="-120" width="180" height="70" rx="6" fill="#fff" opacity=".92"/>
+    <path d="M-70 -96h120M-70 -74h80" stroke="#0a1a33" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+    <g fill="#e8dfd0" stroke="#6b6f7b" stroke-width="3"><circle cx="-122" cy="-140" r="8"/><circle cx="-122" cy="-100" r="8"/><circle cx="-122" cy="-60" r="8"/><circle cx="-122" cy="-20" r="8"/><circle cx="-122" cy="20" r="8"/><circle cx="-122" cy="60" r="8"/><circle cx="-122" cy="100" r="8"/><circle cx="-122" cy="140" r="8"/></g>
+  </g>
+  <g transform="translate(540 340) rotate(8)">
+    <rect x="-124" y="-152" width="260" height="320" rx="10" fill="#3b2f1c" opacity=".18"/>
+    <rect x="-130" y="-160" width="260" height="320" rx="10" fill="#2f7d6b"/>
+    <path d="M-130 -110h260" stroke="#256556" stroke-width="4"/>
+    <rect x="-80" y="-70" width="160" height="56" rx="6" fill="#fff" opacity=".92"/>
+    <path d="M-60 -50h100M-60 -32h60" stroke="#0a1a33" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+  </g>
+  <!-- calculator -->
+  <g transform="translate(250 430) rotate(-18)">
+    <rect x="-62" y="-112" width="136" height="236" rx="16" fill="#3b2f1c" opacity=".2"/>
+    <rect x="-68" y="-120" width="136" height="236" rx="16" fill="#2b2f38"/>
+    <rect x="-52" y="-100" width="104" height="48" rx="6" fill="#b9c8b0"/>
+    <text x="44" y="-66" text-anchor="end" font-family="Consolas,monospace" font-size="24" fill="#1d2a1d">3.1415</text>
+    <g fill="#5a6070"><rect x="-52" y="-36" width="20" height="16" rx="4"/><rect x="-24" y="-36" width="20" height="16" rx="4"/><rect x="4" y="-36" width="20" height="16" rx="4"/><rect x="32" y="-36" width="20" height="16" rx="4"/><rect x="-52" y="-10" width="20" height="16" rx="4"/><rect x="-24" y="-10" width="20" height="16" rx="4"/><rect x="4" y="-10" width="20" height="16" rx="4"/><rect x="32" y="-10" width="20" height="16" rx="4"/></g>
+    <g fill="#e6e8ee"><rect x="-52" y="18" width="20" height="18" rx="4"/><rect x="-24" y="18" width="20" height="18" rx="4"/><rect x="4" y="18" width="20" height="18" rx="4"/><rect x="-52" y="44" width="20" height="18" rx="4"/><rect x="-24" y="44" width="20" height="18" rx="4"/><rect x="4" y="44" width="20" height="18" rx="4"/><rect x="-52" y="70" width="20" height="18" rx="4"/><rect x="-24" y="70" width="20" height="18" rx="4"/><rect x="4" y="70" width="20" height="18" rx="4"/></g>
+    <g fill="#d4a72c"><rect x="32" y="18" width="20" height="18" rx="4"/><rect x="32" y="44" width="20" height="18" rx="4"/><rect x="32" y="70" width="20" height="18" rx="4"/></g>
+  </g>
+</svg>
