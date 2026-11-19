@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>FindIt – Lost it? Find it!</title>
+    <meta name="description" content="FindIt – Lost it? Find it! The university lost & found platform." />
+    <meta name="author" content="CyberNexus Scientific Club" />
+    <meta name="theme-color" content="#fafafa" />
+
+    <!-- Theme and language before first paint (no flash, no layout jump).
+         Theme: saved choice, else the system preference.   Keep in sync with src/lib/theme.js
+         Language: saved choice, else Arabic if the browser is in Arabic, else English.   src/lib/i18n.jsx -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+        try {
+          var saved = localStorage.getItem("findit-theme");
+          var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (dark) {
+            root.classList.add("dark");
+            root.style.colorScheme = "dark";
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", "#0e0e0f");
+          }
+        } catch (e) {}
+        try {
+          var lang = localStorage.getItem("findit-lang");
+          if (lang !== "ar" && lang !== "en") lang = /^ar\b/i.test(navigator.language || "") ? "ar" : "en";
+          root.lang = lang;
+          root.dir = lang === "ar" ? "rtl" : "ltr";
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Installable app (PWA) -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="FindIt" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="application-name" content="FindIt" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FindIt · CyberNexus" />
+    <meta property="og:title" content="FindIt – Lost it? Find it!" />
+    <meta property="og:description" content="The university lost &amp; found platform: report a lost or found item and search approved reports." />
+    <meta property="og:image" content="/icons/icon-512.png" />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Montserrat (Latin) · Cairo (Arabic) · Caveat + Aref Ruqaa (hand-written logo tagline) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&family=Cairo:wght@400;500;600;700;800&family=Caveat:wght@700&family=Aref+Ruqaa:wght@700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
