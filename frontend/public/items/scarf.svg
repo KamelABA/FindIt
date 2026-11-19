@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs><pattern id="knit" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M0 4l8 8 8-8M0 12l8 8 8-8M0-4l8 8 8-8" fill="none" stroke="#7d828b" stroke-width="2"/></pattern></defs>
+  <rect width="800" height="600" fill="#cfe0d2"/>
+  <rect y="430" width="800" height="170" fill="#b9b4a6"/>
+  <!-- bench -->
+  <g fill="#3a3d47"><rect x="110" y="130" width="22" height="400" rx="6"/><rect x="668" y="130" width="22" height="400" rx="6"/><rect x="96" y="410" width="50" height="130" rx="6"/><rect x="654" y="410" width="50" height="130" rx="6"/></g>
+  <g fill="#a9743f" stroke="#8a5c2e" stroke-width="3">
+    <rect x="60" y="150" width="680" height="46" rx="8"/><rect x="60" y="212" width="680" height="46" rx="8"/>
+    <rect x="40" y="300" width="720" height="50" rx="8"/><rect x="40" y="360" width="720" height="50" rx="8"/>
+  </g>
+  <!-- long grey scarf draped over the seat -->
+  <path d="M560 300c40 0 76 20 80 60l14 150h-92l-20-140c-4-30 0-70 18-70z" fill="#8d929b"/>
+  <path d="M560 300c40 0 76 20 80 60l14 150h-92l-20-140c-4-30 0-70 18-70z" fill="url(#knit)"/>
+  <g stroke="#8d929b" stroke-width="5" stroke-linecap="round"><path d="M566 510v34M580 510v38M594 510v34M608 510v38M622 510v34M636 510v38M650 510v34"/></g>
+  <path d="M190 280c80-30 170 10 250-6s130-40 180-14c30 16 34 60 4 78-60 34-140 6-220 20s-150 30-214 4c-34-14-36-66 0-82z" fill="#9a9fa8"/>
+  <path d="M190 280c80-30 170 10 250-6s130-40 180-14c30 16 34 60 4 78-60 34-140 6-220 20s-150 30-214 4c-34-14-36-66 0-82z" fill="url(#knit)"/>
+  <g stroke="#9a9fa8" stroke-width="5" stroke-linecap="round"><path d="M168 296l-22-8M164 312l-24 0M166 328l-22 8M172 344l-20 14"/></g>
+  <path d="M214 300c70-18 150 12 226 0" fill="none" stroke="#fff" stroke-width="5" opacity=".25" stroke-linecap="round"/>
+</svg>
