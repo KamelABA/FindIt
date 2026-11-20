@@ -32,15 +32,23 @@ const ACTION_FILTERS = [
   "user.reject",
   "user.suspend",
   "user.unsuspend",
+  "user.role",
+  "settings",
 ];
 
-const TARGET_PATH = { item: null, claim: "/admin/claims", user: "/admin/users" };
+const TARGET_PATH = { item: null, claim: "/admin/claims", user: "/admin/users", settings: null };
 
-/** Extra information saved with the action (reason, edited fields, counts) */
+/** Extra information saved with the action (reason, edited fields, counts, role and setting changes) */
 function Details({ log }) {
   const { t } = useI18n();
   const d = log.details ?? {};
   const parts = [];
+  if (d.from && d.to) parts.push(t("admin.logs.roleChange", t(`admin.status.${d.from}`), t(`admin.status.${d.to}`)));
+  if (d.changes) {
+    for (const [key, value] of Object.entries(d.changes)) {
+      parts.push(`${t(`admin.logs.settingNames.${key}`)}: ${typeof value === "boolean" ? t(value ? "admin.logs.on" : "admin.logs.off") : value}`);
+    }
+  }
   if (d.note) parts.push(`“${d.note}”`);
   if (d.fields?.length) parts.push(t("admin.logs.fields", d.fields.map((f) => t(`admin.logs.fieldNames.${f}`)).join(", ")));
   if (d.count !== undefined) parts.push(t("admin.logs.count", d.count, d.days));
@@ -96,7 +104,12 @@ export default function ActivityLogsPage() {
       header: t("admin.logs.columns.target"),
       render: (log) => {
         const base = TARGET_PATH[log.target_type];
-        const label = log.action === "items.archive_old" ? t("admin.logs.manyItems") : log.target_label || "—";
+        const label =
+          log.action === "items.archive_old"
+            ? t("admin.logs.manyItems")
+            : log.target_type === "settings"
+              ? Object.keys(log.details?.changes ?? {}).map((k) => t(`admin.logs.settingNames.${k}`)).join(", ") || "—"
+              : log.target_label || "—";
         return (
           <span className="block min-w-40">
             <span className="block text-xs text-muted">{t(`admin.logs.targets.${log.target_type}`)}</span>

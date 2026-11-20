@@ -9,7 +9,7 @@ import ActionBar, { ActionError } from "../../components/admin/ActionBar";
 import SegmentedControl from "../../components/SegmentedControl";
 import Icon from "../../components/Icon";
 import { CATEGORIES, categoryLabel, getCategory } from "../../constants/categories";
-import { listItems, itemAction, archiveOldItems } from "../../services/adminApi";
+import { listItems, itemAction, archiveOldItems, getSettings } from "../../services/adminApi";
 import { useAsync } from "../../hooks/useAsync";
 import { useI18n } from "../../lib/i18n";
 import { formatDate } from "../../utils";
@@ -18,7 +18,6 @@ import { useAction, useListParams } from "./hooks";
 import ItemDrawer from "./ItemDrawer";
 
 const FILTERS = ["q", "status", "lifecycle", "category"];
-const ARCHIVE_AFTER_DAYS = 30;
 
 /** Lost items or found items management (same page, `type` = "lost" | "found"). */
 export default function ItemsPage({ type }) {
@@ -36,6 +35,9 @@ export default function ItemsPage({ type }) {
     [type, list.q, list.status, list.lifecycle, list.category, list.page]
   );
 
+  // the archive delay is a system setting (changed by super admins)
+  const { data: settings } = useAsync((signal) => getSettings({ signal }), []);
+
   const changed = () => {
     retry();
     refreshCounts();
@@ -50,7 +52,7 @@ export default function ItemsPage({ type }) {
   const categoryOptions = [{ value: "", label: t("browse.allCategories") }, ...CATEGORIES.map((c) => ({ value: c.slug, label: categoryLabel(t, c.slug) }))];
 
   const archiveOld = () =>
-    action.run(() => archiveOldItems(ARCHIVE_AFTER_DAYS)).then((result) => {
+    action.run(() => archiveOldItems()).then((result) => {
       if (result) setNotice(t("admin.items.archivedNotice", result.archived));
     });
 
@@ -144,7 +146,7 @@ export default function ItemsPage({ type }) {
                 key: "archive-old",
                 label: t("admin.items.archiveOld"),
                 icon: "archive",
-                confirm: { text: t("admin.items.confirmArchiveOld", ARCHIVE_AFTER_DAYS) },
+                confirm: { text: t("admin.items.confirmArchiveOld", settings?.values.archive_after_days ?? "…") },
               },
             ]}
           />

@@ -32,6 +32,7 @@ export async function request(path, { method = "GET", body, headers = {}, signal
   if (!res.ok) {
     const error = new Error(json?.error || (res.status === 404 ? "Not found" : `Server error (${res.status})`));
     error.status = res.status;
+    if (json?.code) error.code = json.code; // e.g. "not_admin", "super_admin_required"
     throw error;
   }
   return json;

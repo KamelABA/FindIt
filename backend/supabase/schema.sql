@@ -10,16 +10,60 @@
 
 -- ── Users ────────────────────────────────────────────────────────────────────
 -- Login / password will be added later. For now an account is identified by its email.
--- `is_admin`: set it to true / false by hand in Supabase (Table Editor → users).
 create table if not exists public.users (
   id                   uuid primary key default gen_random_uuid(),
   full_name            text        not null,
   email                text        not null,
   phone                text,
-  is_admin             boolean     not null default false,
   created_at           timestamptz not null default now()
 );
 create unique index if not exists users_email_unique on public.users (lower(email));
+
+-- Roles (use case diagram): student · admin · super_admin
+--   admin        reviews students, moderates posts and claims, sees statistics and logs
+--   super_admin  everything an admin does + manages admins, roles and system settings
+-- `role` is an enum: Supabase's Table Editor shows it as a dropdown with exactly these 3 choices.
+-- Make the first super admin by hand: Table Editor → users → role → super_admin.
+-- After that, super admins change roles from the dashboard (Admins & roles page).
+do $$
+begin
+  if not exists (
+    select 1 from pg_type t join pg_namespace n on n.oid = t.typnamespace
+    where n.nspname = 'public' and t.typname = 'user_role'
+  ) then
+    create type public.user_role as enum ('student', 'admin', 'super_admin');
+  end if;
+end;
+$$;
+
+alter table public.users add column if not exists role public.user_role not null default 'student';
+
+-- Upgrades from older versions of this file (each step runs only when needed)
+do $$
+begin
+  -- 1. `is_admin` is gone: the role says it all. A hand-edited is_admin = true becomes role = admin.
+  --    (dropped first: an automatic is_admin depends on `role` and would block step 2)
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'users' and column_name = 'is_admin' and is_generated = 'NEVER'
+  ) then
+    execute 'update public.users set role = ''admin'' where is_admin and role = ''student''';
+  end if;
+  alter table public.users drop column if exists is_admin;
+
+  -- 2. `role` was a text column: convert it to the enum, keeping every value
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'users' and column_name = 'role' and data_type = 'text'
+  ) then
+    alter table public.users drop constraint if exists users_role_check;
+    alter table public.users alter column role drop default;
+    alter table public.users alter column role type public.user_role using role::public.user_role;
+    alter table public.users alter column role set default 'student';
+  end if;
+end;
+$$;
+create index if not exists users_role_idx on public.users (role);
 
 -- Student verification (registration review) and suspension
 alter table public.users add column if not exists student_number      text;
@@ -147,7 +191,8 @@ begin
     'totals', jsonb_build_object(
       'users', (select jsonb_build_object(
           'total',     count(*),
-          'admins',    count(*) filter (where is_admin),
+          'admins',    count(*) filter (where role in ('admin', 'super_admin')),
+          'super_admins', count(*) filter (where role = 'super_admin'),
           'pending',   count(*) filter (where registration_status = 'pending'),
           'suspended', count(*) filter (where is_suspended)
         ) from public.users),
@@ -233,12 +278,26 @@ $$;
 revoke all on function public.admin_stats(int) from public, anon, authenticated;
 grant execute on function public.admin_stats(int) to service_role;
 
+-- ── System settings (changed by super admins from the dashboard) ─────────────
+-- Every key is read by the backend (src/lib/settings.js), which also validates new values.
+create table if not exists public.settings (
+  key         text primary key,
+  value       jsonb       not null,
+  updated_at  timestamptz not null default now(),
+  updated_by  uuid        references public.users (id) on delete set null
+);
+insert into public.settings (key, value) values
+  ('archive_after_days',     '30'),    -- "Archive old publications" closes open posts older than this
+  ('show_publisher_contact', 'true')   -- false = the public site hides publishers' email and phone
+on conflict (key) do nothing;
+
 -- ── Row Level Security: backend only ─────────────────────────────────────────
 alter table public.users         enable row level security;
 alter table public.categories    enable row level security;
 alter table public.items         enable row level security;
 alter table public.claims        enable row level security;
 alter table public.activity_logs enable row level security;
+alter table public.settings      enable row level security;
 
 -- make the API see the changes right away
 notify pgrst, 'reload schema';

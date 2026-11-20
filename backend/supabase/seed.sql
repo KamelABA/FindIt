@@ -13,45 +13,11 @@ insert into public.categories (slug, name_en, name_ar, sort_order) values
 on conflict (slug) do nothing;
 
 -- ── Users ────────────────────────────────────────────────────────────────────
--- One example admin. To make someone else admin (or remove admin rights),
--- change `is_admin` in Table Editor → users.
--- id_card_url = the student ID card uploaded at registration (example image for now).
-insert into public.users
-  (full_name, email, phone, is_admin, student_number, faculty, id_card_url, registration_status, is_suspended, suspended_at, created_at)
-values
-  ('FindIt Admin', 'admin@findit.dz',   null,            true,  null,           'Administration',  null,                       'approved', false, null,                   '2026-08-25T09:00:00Z'),
-  ('Amine B.',     'amine@univ.dz',     null,            false, '202231004512', 'Computer Science', '/items/student-card.svg', 'approved', false, null,                   '2026-08-28T10:00:00Z'),
-  ('Sara M.',      'sara@univ.dz',      '0555 00 00 00', false, '202131007781', 'Economics',        '/items/student-card.svg', 'approved', false, null,                   '2026-09-01T11:00:00Z'),
-  ('Yacine K.',    'yacine@univ.dz',    null,            false, '202331002210', 'Civil Engineering', '/items/student-card.svg', 'approved', false, null,                  '2026-09-04T08:30:00Z'),
-  ('Nour H.',      'nour@univ.dz',      null,            false, '202231009034', 'Medicine',         '/items/student-card.svg', 'approved', false, null,                   '2026-09-09T14:00:00Z'),
-  ('Lina T.',      'lina@univ.dz',      null,            false, '202431000157', 'Architecture',     '/items/student-card.svg', 'approved', false, null,                   '2026-09-15T09:45:00Z'),
-  ('Riad D.',      'riad@univ.dz',      null,            false, '202131004466', 'Mathematics',      '/items/student-card.svg', 'approved', false, null,                   '2026-09-22T16:20:00Z'),
-  ('Kamel S.',     'kamel@univ.dz',     null,            false, '202331008820', 'Law',              '/items/student-card.svg', 'approved', false, null,                   '2026-10-02T12:00:00Z'),
-  ('Sofiane L.',   'sofiane@univ.dz',   null,            false, '202231006603', 'Economics',        '/items/student-card.svg', 'approved', true,  '2026-10-26T10:00:00Z', '2026-10-12T13:10:00Z'),
-  ('Imane Z.',     'imane@univ.dz',     null,            false, '202431003391', 'Biology',          '/items/student-card.svg', 'rejected', false, null,                   '2026-11-04T15:00:00Z'),
-  ('Meriem A.',    'meriem@univ.dz',    '0661 12 34 56', false, '202431005528', 'Pharmacy',         '/items/student-card.svg', 'pending',  false, null,                   '2026-11-18T10:30:00Z'),
-  ('Walid B.',     'walid@univ.dz',     null,            false, '202431001174', 'Computer Science', '/items/student-card.svg', 'pending',  false, null,                   '2026-11-19T17:05:00Z')
-on conflict do nothing;
-
--- Accounts created by the first version of this file: fill in the new student fields once.
-update public.users u
-set student_number      = v.student_number,
-    faculty             = v.faculty,
-    id_card_url         = v.id_card_url,
-    registration_status = 'approved',
-    created_at          = v.created_at::timestamptz
-from (values
-  ('admin@findit.dz', null,           'Administration',    null,                      '2026-08-25T09:00:00Z'),
-  ('amine@univ.dz',   '202231004512', 'Computer Science',  '/items/student-card.svg', '2026-08-28T10:00:00Z'),
-  ('sara@univ.dz',    '202131007781', 'Economics',         '/items/student-card.svg', '2026-09-01T11:00:00Z'),
-  ('yacine@univ.dz',  '202331002210', 'Civil Engineering', '/items/student-card.svg', '2026-09-04T08:30:00Z'),
-  ('nour@univ.dz',    '202231009034', 'Medicine',          '/items/student-card.svg', '2026-09-09T14:00:00Z'),
-  ('lina@univ.dz',    '202431000157', 'Architecture',      '/items/student-card.svg', '2026-09-15T09:45:00Z'),
-  ('riad@univ.dz',    '202131004466', 'Mathematics',       '/items/student-card.svg', '2026-09-22T16:20:00Z'),
-  ('kamel@univ.dz',   '202331008820', 'Law',               '/items/student-card.svg', '2026-10-02T12:00:00Z')
-) as v (email, student_number, faculty, id_card_url, created_at)
-where lower(u.email) = v.email
-  and u.faculty is null;   -- only accounts never filled in
+-- No users are created by this file: add accounts yourself in Table Editor → users
+-- (set role = super_admin on your own account to open the admin dashboard and manage admins).
+-- The example items, claims and logs below are linked to existing accounts by email
+-- when those accounts exist; otherwise items are added without a publisher, and
+-- claims / logs (which need a person) are skipped.
 
 -- ── Items ────────────────────────────────────────────────────────────────────
 -- Images are the illustrations shipped with the frontend (frontend/public/items).
@@ -154,7 +120,7 @@ from (values
    '{}', 'approved', 'open', null, null, 'amine@univ.dz')
 ) as v (title, description, type, category, location, event_date, created_at, images,
         moderation_status, lifecycle_status, resolved_at, archived_at, publisher_email)
-join public.users u on lower(u.email) = v.publisher_email
+left join public.users u on lower(u.email) = v.publisher_email
 where not exists (select 1 from public.items i where i.title = v.title);
 
 -- ── Claims ───────────────────────────────────────────────────────────────────

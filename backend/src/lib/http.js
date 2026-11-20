@@ -1,10 +1,14 @@
 // Small helpers shared by the routes.
 
-/** Throw one of these from a route: the error handler answers { error: message } with its status. */
+/**
+ * Throw one of these from a route: the error handler answers { error: message, code? } with its status.
+ * `code` lets the frontend tell cases apart (e.g. "not_admin" signs out, "super_admin_required" doesn't).
+ */
 export class HttpError extends Error {
-  constructor(status, message) {
+  constructor(status, message, code) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 

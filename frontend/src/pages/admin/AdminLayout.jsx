@@ -7,11 +7,12 @@ import LanguageSwitch from "../../components/LanguageSwitch";
 import { Spinner } from "../../components/StateMessages";
 import { getAdminEmail, setAdminEmail, getMe, getStats, onAdminDenied } from "../../services/adminApi";
 import { useI18n } from "../../lib/i18n";
+import StatusChip from "../../components/admin/StatusChip";
 import AccessForm from "./AccessForm";
 
 /* ── Session ──────────────────────────────────────────────────────────────────
    TEMPORARY, until login / password exist: the email is checked by the backend (the account must
-   have is_admin = true in the database) and remembered in localStorage.
+   have role = admin or super_admin in the database) and remembered in localStorage.
    When the real login is merged, take the user from it here and delete AccessForm. */
 function useAdminSession() {
   const [state, setState] = useState(() => ({ admin: null, checking: Boolean(getAdminEmail()), error: null }));
@@ -43,7 +44,7 @@ function useAdminSession() {
     return () => controller.abort();
   }, [signIn]);
 
-  // any admin request refused later (is_admin switched off, account suspended…) signs out
+  // any admin request refused later (role changed to student, account suspended…) signs out
   useEffect(() => onAdminDenied((error) => signOut(error)), [signOut]);
 
   return { ...state, signIn, signOut };
@@ -52,7 +53,7 @@ function useAdminSession() {
 /* ── Context: the signed-in admin + the counters shown in the sidebar ───────── */
 const AdminContext = createContext(null);
 
-/** { admin, signOut, totals, refreshCounts } */
+/** { admin: { id, full_name, email, role }, signOut, totals, refreshCounts } */
 export function useAdmin() {
   const context = useContext(AdminContext);
   if (!context) throw new Error("useAdmin must be used inside the admin dashboard");
@@ -67,14 +68,21 @@ const NAV = [
   { to: "/admin/claims", key: "claims", icon: "inbox", badge: (t) => t?.claims.pending },
   { to: "/admin/reports", key: "reports", icon: "chart" },
   { to: "/admin/logs", key: "logs", icon: "history" },
+  // super admin only (use case: Manage Admins, Roles & System Settings)
+  { to: "/admin/team", key: "team", icon: "shield", superOnly: true },
+  { to: "/admin/settings", key: "settings", icon: "tool", superOnly: true },
 ];
+
+export const isSuperAdmin = (admin) => admin?.role === "super_admin";
 
 function SidebarNav({ totals, onNavigate }) {
   const { t } = useI18n();
+  const { admin } = useAdmin();
+  const links = NAV.filter((link) => !link.superOnly || isSuperAdmin(admin));
   return (
     <nav aria-label={t("admin.nav.label")} className="flex-1 overflow-y-auto px-3 py-4">
       <ul className="space-y-1">
-        {NAV.map((link) => {
+        {links.map((link) => {
           const badge = link.badge?.(totals);
           return (
             <li key={link.to}>
@@ -185,6 +193,7 @@ function Shell({ admin, signOut, totals }) {
           <p className="me-auto min-w-0 truncate text-sm text-muted">
             <span className="hidden sm:inline">{t("admin.signedInAs")} </span>
             <strong className="font-semibold text-ink" dir="auto">{admin.full_name}</strong>
+            <StatusChip status={admin.role} className="ms-2 align-middle" />
           </p>
           <LanguageSwitch className="h-9! w-9!" />
           <ThemeToggle className="h-9! w-9!" />
@@ -204,6 +213,23 @@ function Shell({ admin, signOut, totals }) {
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+/** Protects pages reserved to super admins (the API refuses them anyway; this explains why). */
+export function SuperAdminOnly({ children }) {
+  const { t } = useI18n();
+  const { admin } = useAdmin();
+  if (isSuperAdmin(admin)) return children;
+  return (
+    <div className="mx-auto max-w-md rounded-2xl border border-dashed border-ink/20 p-10 text-center">
+      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-paper-2 text-ink-2">
+        <Icon name="shield" className="h-6 w-6" />
+      </span>
+      <p className="mt-4 font-semibold text-ink">{t("admin.superOnly.title")}</p>
+      <p className="mt-1 text-sm text-muted">{t("admin.superOnly.text")}</p>
+      <Link to="/admin" className="btn btn-dark mt-5">{t("admin.nav.overview")}</Link>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { db } from "../../lib/supabase.js";
 import { HttpError, assertUuid, intParam, oneOf, pageParams, runPage, searchFilter, textField } from "../../lib/http.js";
 import { ITEM_COLUMNS, ITEM_TYPES, LIFECYCLE_STATUSES, MODERATION_STATUSES, toItem } from "../../lib/items.js";
 import { logActivity, noteDetails } from "../../lib/activity.js";
+import { getSettings } from "../../lib/settings.js";
 
 const router = Router();
 
@@ -55,11 +56,12 @@ router.get("/:id", async (req, res) => {
 });
 
 /**
- * POST /api/admin/items/archive-old  body { days = 30 }
- * Archives every open publication older than `days` days. → { data: { archived: n } }
+ * POST /api/admin/items/archive-old  body { days? }   (default: the archive_after_days setting)
+ * Archives every open publication older than `days` days. → { data: { archived: n, days } }
  */
 router.post("/archive-old", async (req, res) => {
-  const days = intParam(req.body?.days, { min: 1, max: 3650, fallback: 30 });
+  const { archive_after_days } = await getSettings();
+  const days = intParam(req.body?.days, { min: 1, max: 3650, fallback: archive_after_days });
   const before = new Date(Date.now() - days * 86400000).toISOString();
 
   const { data, error } = await db
@@ -78,7 +80,7 @@ router.post("/archive-old", async (req, res) => {
       details: { days, count: data.length },
     });
   }
-  res.json({ data: { archived: data.length } });
+  res.json({ data: { archived: data.length, days } });
 });
 
 /**

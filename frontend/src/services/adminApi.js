@@ -6,7 +6,7 @@ import { normalizeItem } from "./itemsApi";
  *
  * TEMPORARY sign-in, until login / password exist: the admin's email is kept in localStorage
  * and sent in the X-User-Email header. The backend lets the request through only if that account
- * has is_admin = true in the database. When real login exists, replace adminHeaders() with the
+ * has role = admin or super_admin in the database. When real login exists, replace adminHeaders() with the
  * session token and remove the email form in pages/admin/AccessForm.jsx.
  */
 const EMAIL_KEY = "findit-admin-email";
@@ -28,7 +28,7 @@ export function setAdminEmail(email) {
   }
 }
 
-// Called when the server refuses the admin (401 / 403), e.g. is_admin was switched off in the database
+// Called when the server refuses the admin (401 / 403), e.g. the role was changed to student
 let deniedHandler = null;
 export function onAdminDenied(handler) {
   deniedHandler = handler;
@@ -37,11 +37,15 @@ export function onAdminDenied(handler) {
   };
 }
 
+// Server answers that mean "you are not (or no longer) an admin": sign out.
+// Not "super_admin_required": an admin simply can't do that one thing.
+const SIGN_OUT_CODES = new Set(["sign_in_required", "no_account", "not_admin", "suspended"]);
+
 async function admin(path, { email, ...options } = {}) {
   try {
     return await request(`/admin${path}`, { ...options, headers: { "X-User-Email": email ?? getAdminEmail() } });
   } catch (error) {
-    if (!email && (error.status === 401 || error.status === 403)) deniedHandler?.(error);
+    if (!email && SIGN_OUT_CODES.has(error.code)) deniedHandler?.(error);
     throw error;
   }
 }
@@ -102,8 +106,8 @@ export const itemAction = (id, action, note) =>
 
 export const deleteItem = (id, note) => admin(`/items/${encodeURIComponent(id)}`, { method: "DELETE", body: { note } });
 
-/** Archives open publications older than `days` days → { archived: n } */
-export const archiveOldItems = (days = 30) => admin("/items/archive-old", { method: "POST", body: { days } }).then((r) => r.data);
+/** Archives open publications older than the archive_after_days setting → { archived: n, days } */
+export const archiveOldItems = () => admin("/items/archive-old", { method: "POST", body: {} }).then((r) => r.data);
 
 /* ── Claims ──────────────────────────────────────────────────────────────── */
 
@@ -118,7 +122,11 @@ export const claimAction = (id, action, note) =>
 
 /* ── Users ───────────────────────────────────────────────────────────────── */
 
-/** params: { q, status, suspended, role, page } */
+/** Super admin: role = "student" | "admin" | "super_admin" */
+export const setUserRole = (id, role, note) =>
+  admin(`/users/${encodeURIComponent(id)}/role`, { method: "PUT", body: { role, note } }).then((r) => r.data);
+
+/** params: { q, status, suspended, role: student|admin|super_admin|staff, page } */
 export const listUsers = (params = {}, { signal } = {}) => admin(`/users${query(params)}`, { signal }).then((json) => toPage(json));
 
 export const getUser = (id, { signal } = {}) => admin(`/users/${encodeURIComponent(id)}`, { signal }).then((r) => r.data);
@@ -126,6 +134,16 @@ export const getUser = (id, { signal } = {}) => admin(`/users/${encodeURICompone
 /** action: "approve" | "reject" | "suspend" | "unsuspend" */
 export const userAction = (id, action, note) =>
   admin(`/users/${encodeURIComponent(id)}/${action}`, { method: "POST", body: { note } }).then((r) => r.data);
+
+/* ── System settings ─────────────────────────────────────────────────────── */
+
+/** [{ key, value, updated_at, updated_by }] → { values: { key: value }, list } */
+const toSettings = (r) => ({ values: Object.fromEntries(r.data.map((s) => [s.key, s.value])), list: r.data });
+
+export const getSettings = ({ signal } = {}) => admin("/settings", { signal }).then(toSettings);
+
+/** Super admin: changes = { archive_after_days?, show_publisher_contact? } */
+export const updateSettings = (changes) => admin("/settings", { method: "PATCH", body: changes }).then(toSettings);
 
 /* ── Activity logs ───────────────────────────────────────────────────────── */
 

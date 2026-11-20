@@ -43,6 +43,7 @@ export default function UsersPage() {
     { value: "", label: t("admin.status.all") },
     { value: "student", label: t("admin.users.students") },
     { value: "admin", label: t("admin.users.admins") },
+    { value: "super_admin", label: t("admin.users.superAdmins") },
   ];
 
   const columns = [
@@ -53,7 +54,7 @@ export default function UsersPage() {
         <span className="block min-w-44">
           <span className="flex items-center gap-2 font-semibold text-ink" dir="auto">
             {user.full_name}
-            {user.is_admin && <StatusChip status="admin" />}
+            {user.role !== "student" && <StatusChip status={user.role} />}
           </span>
           <span className="block text-xs text-muted" dir="ltr">{user.email}</span>
         </span>

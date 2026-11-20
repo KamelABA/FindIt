@@ -84,7 +84,11 @@ function RecentActivity() {
               <strong className="font-semibold">{log.admin?.full_name ?? t("admin.logs.unknownAdmin")}</strong>{" "}
               <span className="text-ink-2">{t(`admin.logs.actions.${log.action}`)}</span>{" "}
               <span className="font-medium" dir="auto">
-                {log.action === "items.archive_old" ? `(${t("admin.logs.count", log.details?.count, log.details?.days)})` : log.target_label}
+                {log.action === "items.archive_old"
+                  ? `(${t("admin.logs.count", log.details?.count, log.details?.days)})`
+                  : log.target_type === "settings"
+                    ? Object.keys(log.details?.changes ?? {}).map((k) => t(`admin.logs.settingNames.${k}`)).join(", ")
+                    : log.target_label}
               </span>
             </p>
             <p className="text-xs text-muted">{formatDateTime(log.created_at, dateLocale)}</p>

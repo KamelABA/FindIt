@@ -19,7 +19,9 @@ const STATUS_TONE = {
   archived: "dark",
   suspended: "bad",
   active: "good",
+  student: "neutral",
   admin: "brand",
+  super_admin: "dark",
 };
 
 /** status: a key of admin.status in the locales (pending, approved, resolved, suspended…) */

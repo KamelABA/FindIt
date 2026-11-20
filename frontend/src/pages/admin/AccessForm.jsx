@@ -9,6 +9,7 @@ import { useI18n, errorText } from "../../lib/i18n";
 /** Readable reason why the email was refused */
 function accessErrorText(t, error) {
   if (error.status === 401) return t("admin.access.noAccount");
+  if (error.code === "suspended") return t("admin.access.suspended");
   if (error.status === 403) return t("admin.access.notAdmin");
   if (error.status === 503) return t("admin.access.disabled");
   return errorText(t, error);
@@ -16,7 +17,7 @@ function accessErrorText(t, error) {
 
 /**
  * TEMPORARY sign-in, until login / password exist: the admin types an email,
- * the backend accepts it only if that account has is_admin = true (and is not suspended).
+ * the backend accepts it only if that account has role = admin or super_admin (and is not suspended).
  */
 export default function AccessForm({ onSubmit, checking, error }) {
   const { t } = useI18n();
