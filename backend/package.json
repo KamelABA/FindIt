@@ -1,0 +1,19 @@
+{
+  "name": "findit-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "FindIt REST API (Node.js + Express + Supabase)",
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file=.env src/server.js",
+    "start": "node --env-file=.env src/server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.2",
+    "cors": "^2.8.6",
+    "express": "^5.3.0"
+  }
+}
