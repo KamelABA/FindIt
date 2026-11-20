@@ -386,11 +386,55 @@ dialog.app-dialog::backdrop {
   animation-delay: var(--float-delay, 0s);
 }
 
+/* Admin dashboard – chart colours.
+   Validated for colour-blind readers (adjacent pairs ΔE ≥ 8) against the light (#fff) and dark (#1e1e21) surfaces.
+   Slots are used in this order, never cycled. Lost = slot 2 (warm), found = slot 3 (green-aqua).
+   Light aqua / yellow are under 3:1 on white: every chart therefore has direct labels and a table view. */
+.viz {
+  --viz-1: #2a78d6;
+  --viz-2: #eb6834;
+  --viz-3: #1baf7a;
+  --viz-4: #eda100;
+  --viz-ink-4: #0b0b0b; /* text inside a slot-4 block */
+  --viz-lost: var(--viz-2);
+  --viz-found: var(--viz-3);
+  --viz-grid: #ececec;
+  --viz-axis: #c3c2b7;
+}
+html.dark .viz {
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-3: #199e70;
+  --viz-4: #c98500;
+  --viz-ink-4: #ffffff;
+  --viz-grid: #2c2c2f;
+  --viz-axis: #45454a;
+}
+
+/* Admin drawer slides in from the end side */
+@keyframes drawer-in {
+  from {
+    translate: 100% 0;
+  }
+}
+.drawer-in {
+  animation: drawer-in 0.32s var(--ease-out-expo);
+}
+html[dir="rtl"] .drawer-in {
+  animation-name: drawer-in-rtl;
+}
+@keyframes drawer-in-rtl {
+  from {
+    translate: -100% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .float-soft {
+  .float-soft,
+  .drawer-in {
     animation: none;
   }
   .btn-primary::after,

@@ -43,14 +43,10 @@ The platform will support the following item categories:
 
 ## Technology Stack
 
-Technology stack is currently TBD and will be selected as the project requirements are clarified.
-
-Planned areas may include:
-
-- Frontend framework: TBD
-- Backend framework: TBD
-- Database: TBD
-- Authentication: TBD
+- Frontend: React 19 + Vite + Tailwind CSS v4 + GSAP (`frontend/`)
+- Backend: Node.js + Express 5 REST API (`backend/`)
+- Database: Supabase (PostgreSQL), accessed only by the backend
+- Authentication: TBD (admin dashboard uses a temporary email check against `users.is_admin`)
 - Hosting and deployment: TBD
 
 ## Project Architecture
@@ -130,7 +126,14 @@ cd FindIt
 git checkout dev
 ```
 
-Additional setup commands will be added once the chosen frontend/backend stack is finalized.
+Then:
+
+1. **Database**: run `backend/supabase/schema.sql` then `backend/supabase/seed.sql` in the Supabase SQL Editor (run them again after pulling changes to these files: they upgrade the database without losing data).
+2. **Backend**: `cd backend`, `npm install`, copy `.env.example` to `.env` and fill in the Supabase keys, then `npm run dev` (http://localhost:5000/api).
+3. **Frontend**: `cd frontend`, `npm install`, copy `.env.example` to `.env`, then `npm run dev` (http://localhost:5173).
+4. **Admin dashboard**: open http://localhost:5173/admin and enter the email of a user with `is_admin = true` (example: `admin@findit.dz`).
+
+Details: [`backend/README.md`](backend/README.md), [`frontend/README.md`](frontend/README.md).
 
 ## Contribution Guidelines
 
