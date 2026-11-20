@@ -1,0 +1,13 @@
+# Secrets: never commit real keys (copy .env.example to .env instead)
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output (reinstall with npm install / rebuild with npm run build)
+node_modules/
+dist/
+.vite/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
