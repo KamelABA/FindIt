@@ -1,0 +1,405 @@
+@import "tailwindcss";
+/* Agent skills (.claude) are tooling, not app code: keep their class names out of the build. */
+@source not "../.claude";
+
+/* Dark mode = the `dark` class on <html> (set by lib/theme.js; first paint by the script in index.html). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* FindIt brand identity – shared with the whole team
+   ───────────────────────────────────────────────────
+   Palette:  Primary Red #E10600 · Dark Charcoal #1A1A1A · Slate Gray #6B7280
+             Light Gray #E5E7EB · Background #FAFAFA · Accent Pink #F87171
+   Type:     Montserrat for titles, text and small text. Caveat only for the logo tagline.
+
+   THEMED tokens flip between light and dark. Use them for anything that sits on the page:
+     text-ink · text-ink-2 · text-muted · text-brand-ink
+     bg-paper · bg-paper-2 · bg-surface (cards, fields)
+     border-ink/10 · bg-ink/[0.06] …  (lines and tints)
+   FIXED tokens never change. Use them on surfaces that keep their colour in both themes:
+     bg-brand-500 (red) · bg-coal-900 (charcoal footer) · text-white · text-brand-300 (pink on dark) */
+@theme {
+  /* fixed brand palette */
+  --color-brand-100: #fee2e2;
+  --color-brand-300: #f87171; /* Accent Pink */
+  --color-brand-500: #e10600; /* Primary Red */
+  --color-brand-600: #b80500;
+
+  --color-coal-50: #f3f4f6;
+  --color-coal-100: #e5e7eb; /* Light Gray */
+  --color-coal-500: #6b7280; /* Slate Gray */
+  --color-coal-700: #3a3a3a;
+  --color-coal-800: #262626;
+  --color-coal-900: #1a1a1a; /* Dark Charcoal */
+
+  /* themed tokens – light values (dark values are in html.dark below) */
+  --color-ink: #1a1a1a;
+  --color-ink-2: #374151;
+  --color-muted: #6b7280;
+  --color-brand-ink: #e10600; /* red used as text */
+  --color-paper: #fafafa;
+  --color-paper-2: #f1f2f4;
+  --color-surface: #ffffff;
+  --color-lost: #d10500;
+  --color-found: #15803d;
+
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Montserrat", ui-sans-serif, system-ui, sans-serif; /* small labels and numbers */
+  --font-hand: "Caveat", "Aref Ruqaa", "Segoe Print", cursive; /* logo tagline only (Aref Ruqaa draws the Arabic one) */
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --nav-h: 3.375rem; /* height the sticky nav bar takes at the top of the page */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+    --color-ink: #f5f5f5;
+    --color-ink-2: #d4d4d8;
+    --color-muted: #a1a1aa;
+    --color-brand-ink: #f87171;
+    --color-paper: #0e0e0f;
+    --color-paper-2: #151517;
+    --color-surface: #1e1e21;
+    --color-brand-100: #3b1414;
+    --color-lost: #f87171;
+    --color-found: #4ade80;
+  }
+  /* Arabic: Cairo for everything (Montserrat has no Arabic letters). Arabic letters are joined, so
+     letter-spacing must be 0 or the words fall apart; and its taller glyphs need more line height. */
+  html[lang="ar"] {
+    --font-sans: "Cairo", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Cairo", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "Cairo", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  }
+  html[lang="ar"] *:not([lang="en"]) {
+    letter-spacing: 0 !important;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--color-brand-500);
+    color: #fff;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  button:not(:disabled),
+  summary,
+  [role="button"] {
+    cursor: pointer;
+  }
+}
+
+/* ── Scrollbars: a thin red line, no track and no arrow buttons ──────────────
+   Applies to the page and to every scrollable box. It stays visible on purpose:
+   it is the only hint that there is more content. */
+
+/* Firefox, and browsers without the WebKit pseudo-elements: the two standard properties.
+   (Kept inside @supports: in Chrome, setting them would switch the WebKit styling below off.) */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-brand-500) 75%, transparent) transparent;
+  }
+}
+
+/* Chrome, Edge, Safari: full control */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-brand-500) 75%, transparent);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+  background: var(--color-brand-500);
+}
+
+/* Custom utilities (Tailwind v4 syntax) */
+@utility glass {
+  @apply border border-white/20 bg-white/10 backdrop-blur-md;
+}
+/* Buttons – identity: full pills. Red = main action ("Report Lost"), charcoal = second action ("Report Found"). */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition duration-200 ease-out-expo focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply bg-brand-500 text-white shadow-[0_10px_22px_-12px_rgba(225,6,0,0.75)] hover:bg-brand-600;
+}
+/* charcoal in light mode, white in dark mode */
+@utility btn-dark {
+  @apply bg-coal-900 text-white shadow-[0_10px_22px_-14px_rgba(0,0,0,0.7)] hover:bg-coal-700 dark:bg-white dark:text-coal-900 dark:hover:bg-coal-100;
+}
+/* for surfaces that are always dark (footer) */
+@utility btn-outline {
+  @apply border border-white/30 text-white hover:border-white/60 hover:bg-white/10;
+}
+@utility btn-ghost {
+  @apply border border-ink/15 text-ink hover:border-ink/40 hover:bg-surface;
+}
+/* round icon-only button (theme switch, install, menu) */
+@utility btn-icon {
+  @apply grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink-2 transition-colors duration-200 hover:bg-ink/[0.08] hover:text-ink;
+}
+@utility container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+/* Full-screen sections.
+   section-screen-first: the first block of a page. Nav bar + block = exactly one screen.
+   section-screen:       every following block = one screen (it grows when its content is taller).
+   Combine with `flex flex-col justify-center` to centre the content. `--nav-h` = pt-2.5 + 44px capsule. */
+@utility section-screen-first {
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100svh - var(--nav-h));
+}
+@utility section-screen {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+/* Small label above headings and for metadata */
+@utility eyebrow {
+  @apply text-[11px] font-bold uppercase tracking-[0.14em];
+}
+/* Titles: Montserrat ExtraBold */
+@utility display {
+  @apply font-display font-extrabold leading-[1.08] tracking-[-0.02em];
+}
+
+/* Arabic titles: Cairo is taller than Montserrat */
+html[lang="ar"] .display {
+  line-height: 1.35;
+}
+
+/* ── Button motion (JS part: src/lib/buttonEffects.js) ───────────────────────
+   Everything here animates transform / translate / opacity only → runs on the compositor. */
+.btn {
+  transform: translateZ(0); /* own layer + containing block for the sheen and the ripple */
+  overflow: hidden;
+}
+/* a band of light sweeps across the two filled buttons on hover */
+.btn-primary::after,
+.btn-dark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.3) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+.btn-primary:hover::after,
+.btn-dark:hover::after {
+  transform: translateX(120%);
+  transition: transform 0.75s var(--ease-out-expo);
+}
+html.dark .btn-dark::after {
+  background: linear-gradient(105deg, transparent 35%, rgb(0 0 0 / 0.1) 50%, transparent 65%);
+}
+/* the trailing arrow / chevron leans forward on hover (backwards in Arabic) */
+.btn > svg:last-child:not(:first-child) {
+  transition: translate 0.3s var(--ease-out-expo);
+}
+.btn:hover > svg:last-child:not(:first-child) {
+  translate: 4px 0;
+}
+[dir="rtl"] .btn:hover > svg:last-child:not(:first-child) {
+  translate: -4px 0;
+}
+/* ripple from the point that was pressed */
+.btn-ripple {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.22;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  animation: btn-ripple 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes btn-ripple {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+/* magnetic buttons lean towards the pointer: the two variables are written by buttonEffects.js,
+   the button's own transition (which includes `translate`) does the smoothing */
+[data-magnetic] {
+  translate: var(--mx, 0px) var(--my, 0px);
+}
+
+/* ── Living background (components/AmbientBackground.jsx) ─────────────────── */
+.ambient-red {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-brand-500) 13%, transparent), transparent);
+}
+.ambient-pink {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-brand-300) 16%, transparent), transparent);
+}
+.ambient-ink {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-ink) 7%, transparent), transparent);
+}
+html.dark .ambient-red {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-brand-500) 20%, transparent), transparent);
+}
+
+/* ── Word band (components/Marquee.jsx): every second word is drawn as an outline ── */
+.marquee-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+html[lang="ar"] .marquee .display {
+  font-style: normal;
+  line-height: 1.5;
+}
+/* joined Arabic letters would show their overlaps as outlines: use a soft fill instead */
+html[lang="ar"] .marquee-outline {
+  -webkit-text-stroke: 0;
+  color: color-mix(in srgb, var(--color-ink) 24%, transparent);
+}
+
+/* ── Navigation capsule (components/Navbar.jsx) ───────────────────────────── */
+.nav-pill {
+  padding-block: 0.1875rem;
+  padding-inline: 0.5rem 0.25rem; /* logical: mirrors in Arabic */
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.76);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgb(26 26 26 / 0.1);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    0 10px 30px -18px rgb(0 0 0 / 0.4);
+}
+html.dark .nav-pill {
+  background: rgb(30 30 33 / 0.76);
+  border-color: rgb(255 255 255 / 0.12);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 10px 30px -16px rgb(0 0 0 / 0.8);
+}
+/* the tray the links sit in */
+.nav-tray {
+  background: rgb(26 26 26 / 0.06);
+  box-shadow: inset 0 0 0 1px rgb(26 26 26 / 0.05);
+}
+html.dark .nav-tray {
+  background: rgb(0 0 0 / 0.35);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+/* a link turns white while the red highlight is under it */
+.nav-link {
+  color: var(--color-ink-2);
+}
+.nav-link[data-lit="true"] {
+  color: #fff;
+}
+/* solid surface for people who ask for less transparency, and where blur isn't supported */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .nav-pill {
+    background: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav-pill {
+    background: var(--color-surface);
+  }
+}
+.mobile-menu {
+  background: var(--color-paper);
+}
+
+/* CyberNexus wordmark colours (the club's own gradient) */
+.cyber-text {
+  background: linear-gradient(90deg, #5cc8f4, #8f7cf6 55%, #c56df0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Install dialog (components/InstallApp.jsx) */
+dialog.app-dialog {
+  margin: auto;
+  width: min(100% - 2rem, 26rem);
+  max-height: min(100dvh - 2rem, 44rem);
+  overflow-y: auto;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+  border-radius: 1.75rem;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  padding: 1.25rem;
+  box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.6);
+}
+dialog.app-dialog::backdrop {
+  background: rgb(10 10 10 / 0.6);
+}
+
+/* Theme switch: the new theme grows as a circle from the button (View Transitions API) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Entrances, text reveals and filter transitions are done with GSAP: see src/lib/gsap.js,
+   components/SplitReveal.jsx, StaggerIn.jsx and SegmentedControl.jsx. */
+
+@keyframes float-soft {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+.float-soft {
+  animation: float-soft 7s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .float-soft {
+    animation: none;
+  }
+  .btn-primary::after,
+  .btn-dark::after,
+  .btn-ripple {
+    display: none;
+  }
+  [data-magnetic],
+  .btn:hover > svg:last-child:not(:first-child) {
+    translate: none;
+  }
+}
