@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, Outlet, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -7,8 +7,12 @@ import Home from "./pages/Home";
 import ItemDetails from "./pages/ItemDetails";
 import BrowseItems from "./pages/BrowseItems";
 import Placeholder from "./pages/Placeholder";
+import { Spinner } from "./components/StateMessages";
 import { useI18n } from "./lib/i18n";
 import { useButtonEffects } from "./lib/buttonEffects";
+
+// Admin dashboard (its own layout, sidebar and routes). Loaded only when /admin is opened.
+const AdminRoutes = lazy(() => import("./pages/admin/AdminRoutes"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -39,6 +43,15 @@ function Layout() {
 export default function App() {
   return (
     <Routes>
+      <Route
+        path="admin/*"
+        element={
+          <Suspense fallback={<Spinner />}>
+            <ScrollToTop />
+            <AdminRoutes />
+          </Suspense>
+        }
+      />
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="items" element={<BrowseItems />} />

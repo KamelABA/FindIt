@@ -16,12 +16,10 @@ npm run dev               # http://localhost:5173
 
 | المتغير في `.env` | معناه |
 |---|---|
-| `VITE_USE_MOCK=true` | الموقع يعمل ببيانات تجريبية (`src/data/mockItems.js`) دون backend |
-| `VITE_USE_MOCK=false` | الموقع يطلب البيانات من `VITE_API_URL` |
 | `VITE_API_URL` | رابط الـ API، الافتراضي `http://localhost:5000/api` |
 | `VITE_AUTH_ENABLED=true` | يظهر Login و Register في الشريط العلوي وزر Claim في صفحة الغرض |
 
-عند استعمال الـ backend الحقيقي يجب أن يسمح بطلبات CORS من `http://localhost:5173`.
+كل البيانات تأتي من قاعدة البيانات (Supabase) عبر الـ backend، فشغّله أولاً: انظر [`backend/README.md`](../backend/README.md).
 
 ## ما الموجود
 
@@ -35,7 +33,11 @@ npm run dev               # http://localhost:5173
 | `src/components/ItemCard.jsx` | بطاقة الغرض القابلة لإعادة الاستعمال |
 | `src/components/SearchBar.jsx`, `CategoryCard.jsx`, `ItemStatusBadge.jsx` | مكوّنات مشتركة |
 | `src/components/SplitReveal.jsx`, `StaggerIn.jsx`, `SegmentedControl.jsx`, `Marquee.jsx` | مكوّنات الحركة (GSAP) |
-| `src/services/itemsApi.js` | الاتصال بالـ API، `normalizeItem`، وإظهار المعتمد والنشط فقط |
+| `src/pages/admin/` | لوحة المشرف (`/admin`) بتخطيطها الخاص: نظرة عامة، المستخدمون، المفقودات، الموجودات، المطالبات، التقارير، سجل النشاط. `AdminLayout.jsx` يحمي كل المسارات |
+| `src/components/admin/` | مكوّنات اللوحة القابلة لإعادة الاستعمال: `DataTable`, `FilterBar`, `SearchField`, `Pagination`, `Drawer`, `ActionBar`, `StatCard`, `StatusChip`, `PageHeader`، والرسوم في `charts/` |
+| `src/services/apiClient.js` | دالة `request` المشتركة للاتصال بالـ API |
+| `src/services/itemsApi.js` | الأغراض العامة، `normalizeItem`، وإظهار المعتمد والنشط فقط |
+| `src/services/adminApi.js` | طلبات لوحة المشرف |
 | `src/lib/i18n.jsx`, `src/locales/` | الترجمة (إنجليزية وعربية) |
 | `src/lib/theme.js`, `src/lib/install.js` | الوضع الليلي، والتثبيت كتطبيق |
 | `src/index.css` | نظام التصميم: الألوان، الخطوط، الأزرار |

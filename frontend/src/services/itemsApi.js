@@ -1,9 +1,8 @@
-import { API_URL, USE_MOCK } from "../config/env";
-import { MOCK_ITEMS } from "../data/mockItems";
+import { request } from "./apiClient";
 
 /**
  * Converts whatever the backend returns into ONE stable shape for the UI.
- * If Chaima / Asma rename a field, only this function needs to change.
+ * If a field is renamed in the API, only this function needs to change.
  */
 export function normalizeItem(raw = {}) {
   const images = raw.images ?? raw.image_urls ?? (raw.image_url ? [raw.image_url] : []);
@@ -31,74 +30,11 @@ export function normalizeItem(raw = {}) {
 export const isPublic = (item) => item.moderationStatus === "approved" && item.isActive !== false;
 
 /**
- * `lang` ("en" | "ar") is the language of the interface.
- * - Real API: sent as the `Accept-Language` header, in case the backend ever returns translated text.
- *   Today the items are shown as their publisher wrote them.
- * - Mock data: every mock item has an `ar` block, used when the interface is in Arabic.
- */
-async function request(path, { signal, lang } = {}) {
-  const headers = { Accept: "application/json" };
-  if (lang) headers["Accept-Language"] = lang;
-
-  let res;
-  try {
-    res = await fetch(`${API_URL}${path}`, { signal, headers });
-  } catch (cause) {
-    if (cause.name === "AbortError") throw cause; // request cancelled on unmount / change
-    // Network failure (server down, offline, CORS): show a readable message instead of "Failed to fetch"
-    const error = new Error("Can’t reach the server. Check your connection and try again.", { cause });
-    error.code = "network"; // the UI translates by code / status (see errorText in lib/i18n.jsx)
-    throw error;
-  }
-  if (!res.ok) {
-    const error = new Error(res.status === 404 ? "Item not found" : `Server error (${res.status})`);
-    error.status = res.status;
-    throw error;
-  }
-  return res.json();
-}
-
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-
-/** Mock only: swap in the Arabic title / description / location / publisher name. */
-function localizeMock(raw, lang) {
-  const text = lang === "ar" ? raw.ar : null;
-  if (!text) return raw;
-  return {
-    ...raw,
-    title: text.title ?? raw.title,
-    description: text.description ?? raw.description,
-    location: text.location ?? raw.location,
-    publisher: { ...raw.publisher, name: text.publisher ?? raw.publisher?.name },
-  };
-}
-
-const mockItems = (lang) => MOCK_ITEMS.map((raw) => normalizeItem(localizeMock(raw, lang)));
-
-function filterMock({ q, category, type, lang }) {
-  const term = (q || "").trim().toLowerCase();
-  return mockItems(lang)
-    .filter(isPublic)
-    .filter((i) => !category || i.category === category)
-    .filter((i) => !type || i.type === type)
-    .filter(
-      (i) =>
-        !term ||
-        [i.title, i.description, i.location].some((f) => f.toLowerCase().includes(term))
-    )
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-}
-
-/**
- * GET /items?status=approved&active=true&q=&category=&type=&limit=&sort=-created_at
- * Expected response: { data: Item[] }  or  Item[]
+ * GET /items?q=&category=&type=&limit=   (the API returns approved + active items only, newest first)
+ * `lang` is sent as Accept-Language; items are shown as their publisher wrote them.
  */
 export async function getItems({ q, category, type, limit = 8, signal, lang } = {}) {
-  if (USE_MOCK) {
-    await delay(200);
-    return filterMock({ q, category, type, lang }).slice(0, limit);
-  }
-  const params = new URLSearchParams({ status: "approved", active: "true", sort: "-created_at", limit });
+  const params = new URLSearchParams({ limit });
   if (q) params.set("q", q);
   if (category) params.set("category", category);
   if (type) params.set("type", type);
@@ -109,18 +45,8 @@ export async function getItems({ q, category, type, limit = 8, signal, lang } = 
   return list.map(normalizeItem).filter(isPublic);
 }
 
-/** GET /items/:id   Expected response: { data: Item } or Item */
+/** GET /items/:id   →  { data: Item } */
 export async function getItemById(id, { signal, lang } = {}) {
-  if (USE_MOCK) {
-    await delay(150);
-    const found = mockItems(lang).find((i) => i.id === String(id));
-    if (!found || !isPublic(found)) {
-      const error = new Error("Item not found");
-      error.status = 404;
-      throw error;
-    }
-    return found;
-  }
   const json = await request(`/items/${encodeURIComponent(id)}`, { signal, lang });
   const item = normalizeItem(json.data ?? json);
   if (!isPublic(item)) {
