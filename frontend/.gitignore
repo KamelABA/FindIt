@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+
+# Agent skills (third-party kits, ~43 MB) and their run state
+.claude/skills/
+.taste-skill/
